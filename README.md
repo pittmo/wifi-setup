@@ -24,7 +24,7 @@ configure and run this server.
 First, clone this repo and download its dependencies from npm:
 
 ```
-$ git clone git@github.com:davidflanagan/wifi-setup.git
+$ git clone git@github.com:pittmo/wifi-setup.git
 $ cd wifi-setup
 $ npm install
 ```
