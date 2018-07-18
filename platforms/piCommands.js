@@ -9,8 +9,13 @@ module.exports = {
 
   // A shell command that outputs the string "COMPLETED" if we are
   // connected to a wifi network and outputs something else otherwise
-  getStatus:
+  getWifiStatus:
     "wpa_cli -iwlan0 status | sed -n -e '/^wpa_state=/{s/wpa_state=//;p;q}'",
+
+  // A shell command that outputs the string "Link detected: yes" if we are
+  // connected to an ethernet network and "Link detected: no" otherwise
+  getEthernetStatus:
+    "ethtool eth0 | grep Link | xargs",
 
   // A shell command that outputs the SSID of the current wifi network
   // or outputs nothing if we are not connected to wifi

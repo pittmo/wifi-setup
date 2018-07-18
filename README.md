@@ -2,17 +2,19 @@
 
 This repo is an Express server designed to run on an IoT device and
 handles the first-time setup required to get the device working
-connected to the user's home wifi network.
+connected to a wifi network. IF an Ethernet (wired) connection is
+present, this application will do nothing since the device is already
+connected to the Internet.
 
 - since the device is not on the local wifi network when it is first
   turned on, the device broadcasts its own wifi access point and runs
   the server on that. The user then connects their phone or laptop to
   that wifi network and uses a web browser (not a native app!) to
   connect to the device at the URL 10.0.0.1 or `<hostname>.local`. The
-  user can select then their home wifi network and enter the password
+  user can then select a wifi network and enter the password
   on a web page and transfer it to the web server running on the
   device. At this point, the device can turn off its private network
-  and connect to the internet using the credentials the user provided.
+  and connect to the Internet using the credentials the user provided.
 
 The code is Linux-specific, depends on systemd, and has so far only
 been tested on a Raspberry Pi 3. It requires hostapd and udhcpd to be
@@ -68,7 +70,7 @@ DHCPD_ENABLED="no"
 Once the wifi-setup server has connected to wifi, it will exit. But if
 you want, it can run a command to make your device start doing
 whatever it is your device does. If you want to use this feature, edit
-`platforms/default.js` to define the `nextStageCommand` property.
+`platforms/piCommands.js` to define the `nextStageCommand` property.
 
 ### Step 4: run the server
 

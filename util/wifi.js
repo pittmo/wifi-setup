@@ -1,5 +1,5 @@
 var run = require('./run.js');
-var platform = require('./platform.js');
+var platform = require('../platforms/piCommands.js');
 
 exports.getStatus = getStatus;
 exports.getConnectedNetwork = getConnectedNetwork;
@@ -18,12 +18,12 @@ exports.getKnownNetworks = getKnownNetworks;
  * a connection is being established
  */
 function getStatus() {
-  return run(platform.getStatus);
+  return run(platform.getWifiStatus);
 }
 
 /*
  * Determine the ssid of the wifi network we are connected to.
- * This function returns a Promise that resolves to a string. 
+ * This function returns a Promise that resolves to a string.
  * The string will be empty if not connected.
  */
 function getConnectedNetwork() {

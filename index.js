@@ -2,10 +2,11 @@ var Express = require('express');
 var Handlebars = require('handlebars');
 var bodyParser = require('body-parser');
 var fs = require('fs');
-var run = require('./run.js');
-var platform = require('./platform.js');
-var wifi = require('./wifi.js');
-var wait = require('./wait.js');
+var run = require('./util/run.js');
+var piCommands = require('./util/piCommands.js');
+var wifi = require('./util/wifi.js');
+var ethernet = require('./util/ethernet.js');
+var wait = require('./util/wait.js');
 
 // The Edison device can't scan for wifi networks while in AP mode, so
 // we've got to scan before we enter AP mode and save the results
@@ -29,21 +30,29 @@ function waitForWifi(maxAttempts, interval) {
     function check() {
       attempts++;
       console.log('check', attempts);
-      wifi.getStatus()
+      ethernet.getStatus()
         .then(status => {
-          console.log(status);
-          if (status === 'COMPLETED') {
-            console.log('Wifi connection found');
-            resolve();
+          if (status.trim() === 'Link detected: yes') {
+              console.log('Connected to Ethernet connection, exiting wifi setup');
+              resolve();
+          } else {
+            wifi.getStatus()
+                .then(status => {
+                    console.log(status);
+                    if (status === 'COMPLETED') {
+                        console.log('Wifi connection found');
+                        resolve();
+                    }
+                    else {
+                        console.log('No wifi connection on attempt', attempts);
+                        retryOrGiveUp()
+                    }
+                })
+                .catch(err => {
+                    console.error('Error checking wifi on attempt', attempts, ':', err);
+                    retryOrGiveUp();
+                });
           }
-          else {
-            console.log('No wifi connection on attempt', attempts);
-            retryOrGiveUp()
-          }
-        })
-        .catch(err => {
-          console.error('Error checking wifi on attempt', attempts, ':', err);
-          retryOrGiveUp();
         });
     }
 
@@ -145,8 +154,8 @@ function handleConnect(request, response) {
 
 // Once wifi is up, we run the next stage command, if there is one, and exit.
 function runNextStageAndExit() {
-  if (platform.nextStageCommand) {
-    run(platform.nextStageCommand)
+  if (piCommands.nextStageCommand) {
+    run(piCommands.nextStageCommand)
       .then((out) => console.log('Next stage started:', out))
       .catch((err) => console.error('Error starting next stage:', err))
       .then(() => process.exit());
@@ -158,5 +167,5 @@ function runNextStageAndExit() {
 
 // You can use this to give user feedback during the setup process.
 function play(filename) {
-  return run(platform.playAudio, { AUDIO: filename });
+  return run(piCommands.playAudio, { AUDIO: filename });
 }
