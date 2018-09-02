@@ -72,6 +72,7 @@ function waitForWifi(maxAttempts, interval) {
 }
 
 // this function handles requests for captive portals
+// Based on original wifi-setup project, https://github.com/mozilla-iot/gateway-wifi-setup
 function handleCaptive(request, response, next) {
     console.log('handleCaptive', request.path);
     if (request.path === '/hotspot.html') {
