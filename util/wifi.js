@@ -82,11 +82,11 @@ function scan(numAttempts) {
  *
  * This command runs different commands on Raspbery Pi Rasbian and Edison Yocto.
  *
- * It requires that hostapd and udhcpd are installed on the system but not
+ * It requires that hostapd and dnsmasq are installed on the system but not
  * enabled, so that they do not automatically run when the device boots up.
- * It also requires that hostapd and udhcpd have appropriate config files
+ * It also requires that hostapd and dnsmasq have appropriate config files
  * that define the ssid for the wifi network to be created, for example.
- * Also, the udhcpd config file should be set up to work with 10.0.0.1 as
+ * Also, the dnsmasq config file should be set up to work with 192.168.220.1 as
  * the IP address of the device.
  *
  * XXX

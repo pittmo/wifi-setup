@@ -1,30 +1,32 @@
 module.exports = {
-  platform: "default",
+    platform: "default",
 
-  // Define this nextStageCommand property to specify what we should
-  // do once wifi is up. If not defined, we'll just exit
+    ap_ip: '192.168.220.1',
+
+    // Define this nextStageCommand property to specify what we should
+    // do once wifi is up. If not defined, we'll just exit
 //  nextStageCommand: 'systemctl start git-auto-updater',
 
-  playAudio: 'aplay -q $AUDIO',
+    playAudio: 'aplay -q $AUDIO',
 
-  // A shell command that outputs the string "COMPLETED" if we are
-  // connected to a wifi network and outputs something else otherwise
-  getWifiStatus:
-    "wpa_cli -iwlan0 status | sed -n -e '/^wpa_state=/{s/wpa_state=//;p;q}'",
+    // A shell command that outputs the string "COMPLETED" if we are
+    // connected to a wifi network and outputs something else otherwise
+    getWifiStatus:
+        "wpa_cli -iwlan0 status | sed -n -e '/^wpa_state=/{s/wpa_state=//;p;q}'",
 
-  // A shell command that outputs the string "Link detected: yes" if we are
-  // connected to an ethernet network and "Link detected: no" otherwise
-  getEthernetStatus:
-    "ethtool eth0 | grep Link | xargs",
+    // A shell command that outputs the string "Link detected: yes" if we are
+    // connected to an ethernet network and "Link detected: no" otherwise
+    getEthernetStatus:
+        "ethtool eth0 | grep Link | xargs",
 
-  // A shell command that outputs the SSID of the current wifi network
-  // or outputs nothing if we are not connected to wifi
-  getConnectedNetwork:
-    "wpa_cli -iwlan0 status | sed -n -e '/^ssid=/{s/ssid=//;p;q}'",
+    // A shell command that outputs the SSID of the current wifi network
+    // or outputs nothing if we are not connected to wifi
+    getConnectedNetwork:
+        "wpa_cli -iwlan0 status | sed -n -e '/^ssid=/{s/ssid=//;p;q}'",
 
-  // A shell command that scans for wifi networks and outputs the ssids in
-  // order from best signal to worst signal, omitting hidden networks
-  scan: `iwlist wlan0 scan |\
+    // A shell command that scans for wifi networks and outputs the ssids in
+    // order from best signal to worst signal, omitting hidden networks
+    scan: `iwlist wlan0 scan |\
 sed -n -e '
   /Quality=/,/ESSID:/H
   /ESSID:/{
@@ -38,22 +40,22 @@ sort -nr |\
 cut -f 2 |\
 sed -e '/^$/d;/\\x00/d'`,
 
-  // A shell command that lists the names of known wifi networks, one
-  // to a line.
-  getKnownNetworks: "wpa_cli -iwlan0 list_networks | sed -e '1d' | cut -f 2",
+    // A shell command that lists the names of known wifi networks, one
+    // to a line.
+    getKnownNetworks: "wpa_cli -iwlan0 list_networks | sed -e '1d' | cut -f 2",
 
-  // Start broadcasting an access point.
-  // The name of the AP is defined in /etc/hostapd/hostapd.conf
-  startAP: 'ifconfig wlan0 10.0.0.1 && systemctl start hostapd && systemctl start udhcpd',
+    // Start broadcasting an access point.
+    // The name of the AP is defined in /etc/hostapd/hostapd.conf
+    startAP: 'ifconfig wlan0 192.168.220.1 && systemctl start hostapd && systemctl start dnsmasq',
 
-  // Stop broadcasting an AP and attempt to reconnect to local wifi
-  stopAP: 'systemctl stop udhcpd && systemctl stop hostapd && ifconfig wlan0 0.0.0.0',
+    // Stop broadcasting an AP and attempt to reconnect to local wifi
+    stopAP: 'systemctl stop dnsmasq && systemctl stop hostapd && ifconfig wlan0 0.0.0.0',
 
-  // Define a new wifi network. Expects the network name and password
-  // in the environment variables SSID and PSK.
-  defineNetwork: 'ID=`wpa_cli -iwlan0 add_network` && wpa_cli -iwlan0 set_network $ID ssid \\"$SSID\\" && wpa_cli -iwlan0 set_network $ID psk \\"$PSK\\" && wpa_cli -iwlan0 enable_network $ID && wpa_cli -iwlan0 save_config',
+    // Define a new wifi network. Expects the network name and password
+    // in the environment variables SSID and PSK.
+    defineNetwork: 'ID=`wpa_cli -iwlan0 add_network` && wpa_cli -iwlan0 set_network $ID ssid \\"$SSID\\" && wpa_cli -iwlan0 set_network $ID psk \\"$PSK\\" && wpa_cli -iwlan0 enable_network $ID && wpa_cli -iwlan0 save_config',
 
-  // Define a new open wifi network. Expects the network name
-  // in the environment variable SSID.
-  defineOpenNetwork: 'ID=`wpa_cli -iwlan0 add_network` && wpa_cli -iwlan0 set_network $ID ssid \\"$SSID\\" && wpa_cli -iwlan0 set_network $ID key_mgmt NONE && wpa_cli -iwlan0 enable_network $ID && wpa_cli -iwlan0 save_config',
+    // Define a new open wifi network. Expects the network name
+    // in the environment variable SSID.
+    defineOpenNetwork: 'ID=`wpa_cli -iwlan0 add_network` && wpa_cli -iwlan0 set_network $ID ssid \\"$SSID\\" && wpa_cli -iwlan0 set_network $ID key_mgmt NONE && wpa_cli -iwlan0 enable_network $ID && wpa_cli -iwlan0 save_config',
 }

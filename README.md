@@ -17,7 +17,7 @@ connected to the Internet.
   and connect to the Internet using the credentials the user provided.
 
 The code is Linux-specific, depends on systemd, and has so far only
-been tested on a Raspberry Pi 3. It requires hostapd and udhcpd to be
+been tested on a Raspberry Pi 3. It requires hostapd and dnsmasq to be
 installed and properly configured. Here are the steps I followed to
 configure and run this server.
 
@@ -39,9 +39,9 @@ Pi, we need to do:
 
 ```
 $ sudo apt-get install hostapd
-$ sudo apt-get install udhcpd
+$ sudo apt-get install dnsmasq
 $ sudo systemctl disable hostapd
-$ sudo systemctl disable udhcpd
+$ sudo systemctl disable dnsmasq
 ```
 
 ### Step 2: configuration files
@@ -57,13 +57,7 @@ DAEMON_CONF="/etc/hostapd/hostapd.conf"
   config file defines the access point name "Wifi Setup". Edit it if
   you want to use a more descriptive name for your device.
 
-- Edit the file `/etc/default/udhcpd` and comment out the line:
-
-```
-DHCPD_ENABLED="no"
-```
-
-- Copy `config/udhcpd.conf` to `/etc/udhcp.conf`.
+- Copy `config/dnsmasq.conf` to `/etc/dnsmasq.conf`.
 
 ### Step 3: set up the other services you want your device to run
 

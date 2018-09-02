@@ -4,11 +4,10 @@ var bodyParser = require('body-parser');
 var fs = require('fs');
 var wifi = require('./util/wifi.js');
 var ethernet = require('./util/ethernet.js');
+var platform = require('./platforms/piCommands');
 var wait = require('./util/wait.js');
 
-var apIp = "10.0.0.1";
-
-// The Edison device can't scan for wifi networks while in AP mode, so
+// Some devices can't scan for wifi networks while in AP mode, so
 // we've got to scan before we enter AP mode and save the results
 var preliminaryScanResults;
 
@@ -16,7 +15,6 @@ var preliminaryScanResults;
 // to 10 times. If we are connected, then start just start the next stage
 // and exit. But if we never get a wifi connection, go into AP mode.
 waitForWifi(20, 3000)
-    .then(runNextStageAndExit)
     .catch(() => {
         startServer();
         startAP()
@@ -84,16 +82,16 @@ function handleCaptive(request, response, next) {
         if (request.get('User-Agent').includes('CaptiveNetworkSupport') ||
             request.get('User-Agent').includes('Microsoft NCSI')) {
             console.log('windows captive portal request');
-            response.redirect(302, `http://${apIp}/hotspot.html`);
+            response.redirect(302, `http://${platform.ap_ip}/hotspot.html`);
         } else {
-            response.redirect(302, `http://${apIp}/wifi-setup`);
+            response.redirect(302, `http://${platform.ap_ip}/wifi-setup`);
         }
     } else if (request.path === '/generate_204' || request.path === '/fwlink/') {
         console.log('android captive portal request');
-        response.redirect(302, `http://${apIp}/wifi-setup`);
+        response.redirect(302, `http://${platform.ap_ip}/wifi-setup`);
     } else if (request.path === '/redirect') {
         console.log('redirect - send setup for windows');
-        response.redirect(302, `http://${apIp}/wifi-setup`);
+        response.redirect(302, `http://${platform.ap_ip}/wifi-setup`);
     } else {
         console.log('skipping.');
         next();
@@ -179,7 +177,7 @@ function handleConnect(request, response) {
         .then(() => wait(5000))
         .then(() => wifi.defineNetwork(ssid, password))
         .then(() => waitForWifi(20, 3000))
-        .then(() => runNextStageAndExit())
+        .then(() => exit())
         .catch(() => {
             // XXX not sure how to handle an error here
             console.error("Failed to bring up wifi in handleConnect()");
@@ -187,6 +185,6 @@ function handleConnect(request, response) {
 }
 
 // Once wifi is up, exit.
-function runNextStageAndExit() {
+function exit() {
     process.exit();
 }
