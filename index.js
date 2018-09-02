@@ -73,19 +73,9 @@ function waitForWifi(maxAttempts, interval) {
 // Based on original wifi-setup project, https://github.com/mozilla-iot/gateway-wifi-setup
 function handleCaptive(request, response, next) {
     console.log('handleCaptive', request.path);
-    if (request.path === '/hotspot.html') {
-        console.log('sending hotspot.html');
-        handleWiFiSetup(request, response);
-    } else if (request.path === '/hotspot-detect.html' ||
-               request.path === '/connecttest.txt') {
+    if (request.path === '/hotspot-detect.html' || request.path === '/connecttest.txt') {
         console.log('ios or osx captive portal request', request.path);
-        if (request.get('User-Agent').includes('CaptiveNetworkSupport') ||
-            request.get('User-Agent').includes('Microsoft NCSI')) {
-            console.log('windows captive portal request');
-            response.redirect(302, `http://${platform.ap_ip}/hotspot.html`);
-        } else {
-            response.redirect(302, `http://${platform.ap_ip}/wifi-setup`);
-        }
+        response.redirect(302, `http://${platform.ap_ip}/wifi-setup`);
     } else if (request.path === '/generate_204' || request.path === '/fwlink/') {
         console.log('android captive portal request');
         response.redirect(302, `http://${platform.ap_ip}/wifi-setup`);
