@@ -43,9 +43,7 @@ sed -e '/^$/d;/\\x00/d'`,
   getKnownNetworks: "wpa_cli -iwlan0 list_networks | sed -e '1d' | cut -f 2",
 
   // Start broadcasting an access point.
-  // The name of the AP is defined in a config file elsewhere
-  // Note that we use different commands on Yocto systems than
-  // we do on Raspbian systems
+  // The name of the AP is defined in /etc/hostapd/hostapd.conf
   startAP: 'ifconfig wlan0 10.0.0.1 && systemctl start hostapd && systemctl start udhcpd',
 
   // Stop broadcasting an AP and attempt to reconnect to local wifi
