@@ -53,7 +53,7 @@ function scan(numAttempts) {
       attempts++;
 
       _scan()
-        .then(out => { resolve(out.length ? out.split('\n') : []);})
+        .then(out => { resolve(out.length ? Array.from(new Set(out.split('\n'))) : []);})
         .catch(err => {
           console.error('Scan attempt', attempts, 'failed:', err.message||err);
 

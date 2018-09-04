@@ -7,6 +7,8 @@ var ethernet = require('./util/ethernet.js');
 var platform = require('./platforms/piCommands');
 var wait = require('./util/wait.js');
 
+var config = require('./config/config');
+
 // Some devices can't scan for wifi networks while in AP mode, so
 // we've got to scan before we enter AP mode and save the results
 var preliminaryScanResults;
@@ -83,7 +85,7 @@ function handleCaptive(request, response, next) {
         console.log('redirect - send setup for windows');
         response.redirect(302, `http://${platform.ap_ip}/wifi-setup`);
     } else {
-        console.log('skipping.');
+        response.redirect(302, `http://${platform.ap_ip}/wifi-setup`);
         next();
     }
 }
@@ -109,10 +111,9 @@ function startServer(wifiStatus) {
     server.use(bodyParser.urlencoded({extended: false}));
 
     // Define the handler methods for the various URLs we handle
-    server.get('/*', handleCaptive);
-    server.get('/', handleWiFiSetup);
     server.get('/wifi-setup', handleWiFiSetup);
     server.post('/connect', handleConnect);
+    server.get('/*', handleCaptive);
 
     // And start listening for connections
     // XXX: note that we are HTTP only... is this a security issue?
@@ -147,7 +148,7 @@ function handleWiFiSetup(request, response) {
         // If not, we could modify wifi.defineNetwork() to overwrite rather than
         // just adding.
 
-        response.send(wifiSetupTemplate({networks: results}));
+        response.send(wifiSetupTemplate({networks: results, appName: config.appName}));
     });
 }
 
