@@ -17,7 +17,7 @@ module.exports = {
     // A shell command that outputs the string "Link detected: yes" if we are
     // connected to an ethernet network and "Link detected: no" otherwise
     getEthernetStatus:
-        "ethtool eth0 | grep Link | xargs",
+        "ethtool eth0 | grep \"Link detected\" | xargs",
 
     // A shell command that outputs the SSID of the current wifi network
     // or outputs nothing if we are not connected to wifi
